@@ -31,14 +31,17 @@ Open cmd or powershell and then navigate to the root folder of the project.
     4. `docker ps -a` - To check the status of the container started.
 
 
-2. Once the container is up and running, open the browser and go to  http://localhost:8080/Chat.html, then you see below simple UI to interact with the backend service and LLM behind it.
+2. Install LM-Studio, download and install `llama-2-7b-chat` model and start the server. Make the server available at `port 5050` in settings. Then run `curl http://localhost:5050/v1/models` in the cmd or powershell to ensure the LLM is up and running at port 5050. Command should return some data with list of models.
+
+
+3. Once the container and LLM are up and running, open the browser and go to  http://localhost:8080/Chat.html, then you see below simple UI to interact with the backend service and LLM behind it.
  ![img.png](img.png)
 
 
-3. Enter any question here and hit send to see the LLM response in the below window.
+4. Enter any question here and hit send to see the LLM response in the below window.
 
 
-4. Swagger package has been added to the pom.xml but there are some issues running it on the browser, hence a simple UI has been added into the source code to allow the user to interact with the API and LLM.
+5. Swagger package has been added to the pom.xml but there are some issues running it on the browser, hence a simple UI has been added into the source code to allow the user to interact with the API and LLM.
 
 
-5. If any frontend system needs to be connected to the API, it can be done by using the url `[POST] /chat`
+6. If any frontend system needs to be connected to the API, it can be done by using the url `[POST] /chat`
