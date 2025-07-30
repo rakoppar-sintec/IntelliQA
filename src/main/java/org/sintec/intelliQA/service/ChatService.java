@@ -2,7 +2,6 @@ package org.sintec.intelliQA.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
@@ -14,6 +13,7 @@ public class ChatService {
     private final WebClient webClient;
     private static final Logger log = LoggerFactory.getLogger(ChatService.class);
     private static final String llmPath = "/v1/chat/completions";
+    private static final String model = "llama-2-7b-chat";
 
     public ChatService(WebClient webClient) {
         this.webClient = webClient;
@@ -22,7 +22,7 @@ public class ChatService {
     public Flux<String> streamAnswer(String question) {
         log.info("ChatService -> streamAnswer called with question: {}", question);
         Map<String, Object> body = Map.of(
-                "model", "llama-2-7b-chat",
+                "model", model,
                 "stream", true,
                 "messages", new Object[] {
                         Map.of("role", "system", "content", "You're a helpful assistant"),
