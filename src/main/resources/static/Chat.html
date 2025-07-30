@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>IntelliQA</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    #question { white-space: pre-wrap; border: 1px solid #ccc; padding: 10px; min-height: 200px; margin-bottom: 10px;}
+    #output { white-space: pre-wrap; border: 1px solid #ccc; padding: 10px; min-height: 200px; }
+  </style>
+</head>
+<body>
+<h2>IntelliQ&A - [POST] /chat </h2>
+<input type="text" id="question" placeholder="Ask a question..." size="80"/>
+<div><button onclick="startChat()">Send</button></div>
+
+<h3>Response:</h3>
+<div id="output"></div>
+
+<script>
+  function startChat() {
+    const question = document.getElementById('question').value;
+    const output = document.getElementById('output');
+    output.textContent = '';
+
+    fetch('http://localhost:8080/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'text/event-stream'
+      },
+      body: JSON.stringify({ question })
+    }).then(response => {
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      function processBuffer() {
+        const lines = buffer.split('\n');
+        buffer = lines.pop();
+
+        lines.forEach(line => {
+          if (line.startsWith('data:')) {
+            try {
+              const jsonStr = line.slice(5).trim();
+              if (jsonStr === '[DONE]') return;
+              const parsed = JSON.parse(jsonStr);
+              const content = parsed.choices?.[0]?.delta?.content;
+              if (content) {
+                output.textContent += content;
+              }
+            } catch (e) {
+              console.error('JSON parse error:', e, line);
+              output.textContent = 'Error Occurred on the server! Try again later';
+            }
+          }
+        });
+      }
+
+      function read() {
+        reader.read().then(({ done, value }) => {
+          if (done) return;
+          buffer += decoder.decode(value, { stream: true });
+          processBuffer();
+          read();
+        });
+      }
+
+      read();
+    }).catch(err => {
+      console.error('Fetch error:', err);
+      output.textContent = 'Error: ' + err.message;
+    });
+  }
+</script>
+</body>
+</html>
